@@ -1,0 +1,80 @@
+
+R version 3.0.2 (2013-09-25) -- "Frisbee Sailing"
+Copyright (C) 2013 The R Foundation for Statistical Computing
+Platform: x86_64-unknown-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> rm(list=ls())
+> 
+> #install.packages("tools")
+> #install.packages("pracma")
+> 
+> 
+> # Install the following libraries if you are missing any of them.
+> #library(XML)
+> #library(pcalg)
+> #library(pracma)
+> #library(tools)
+> #library(graph)
+> #library(pls)
+> #library(permute)
+> #library(C50)
+> 
+> # Set the path where functions.R file is located
+> home <- '/home/dadesai/experiments_mandar/climateData/sahel/'
+> setwd(home)
+> source("functions.R")
+> source("ida.pcr.pvalue.R")
+> 
+> # Climate Indices.csv file should contain the monthly values of indices
+> # For e.g. in case of Sahle it should contain the first six months of all climate indices
+> # Rainfall.csv should contain twelve months of rainfall.
+> data <- read.csv('Climate Raw Data Sahel.csv', row.names=1)
+> raw_rainfall_data <- read.csv('Sahel_Rainfall_Data.csv', header = TRUE)
+> 
+> # Enter the months for the rainfall season. 
+> season <- 7:9
+> col_names <- paste('Rainfall', season, sep='_')
+> seasonal_rainfall_data <- raw_rainfall_data[, col_names]
+> colnames(seasonal_rainfall_data) <- col_names
+> raw_data <- cbind(data, seasonal_rainfall_data)
+> 
+> # Generate training and testing data sets.
+> # The following function call will generate 10 folders, each containing sub-folders with training and testing data.
+> # For eg.
+> # CV_Run_1 -> CV_1, CV_2,...., CV_8; where
+> # CV_1 -> TrainData_CV_1, TestData_CV_1
+> kfold_cv(raw_data, 8)
+Warning message:
+In dir.create(dir_name) :
+  '/home/dadesai/experiments_mandar/climateData/sahel//CV_Run_1' already exists
+> 
+> # Build causal networks using the Tetrad IV software.
+> # You will have to build a causal network for each TrainData_CV_1 and output them in CV_1->Causal_Graphs folder.
+> 
+> # Perform CDFD.
+> # The frequent set of features discovered will be output in a csv file titled "Feature Frequency Count.csv"
+> num_years <- nrow(raw_data)
+> 
+> years <- matrix(1:57, nrow=num_years, ncol=1, dimnames=list(1951:2007))
+> 
+> build_c50 <- predict_c50 <- result_c50 <- list()
+> 
+> disc_org_rainfall_data <-matrix(0, nrow=num_years, ncol=1)
+> disc_org_rainfall_data[, 1] <- getDiscretizedRainfall(raw_data, col_names)
+Error in match.fun(FUN) : object 'detrend' not found
+Calls: getDiscretizedRainfall -> apply -> match.fun
+Execution halted
